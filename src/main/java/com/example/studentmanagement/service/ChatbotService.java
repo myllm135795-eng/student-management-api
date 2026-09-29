@@ -47,28 +47,37 @@ public class ChatbotService {
 
             // Add system message if this is a new conversation
             if (messages.isEmpty()) {
-                messages.add(ChatCompletionMessage.ofSystem(SYSTEM_PROMPT));
+                messages.add(ChatCompletionMessage.builder()
+                    .role(ChatCompletionRole.SYSTEM)
+                    .content(SYSTEM_PROMPT)
+                    .build());
             }
 
             // Add user message
-            messages.add(ChatCompletionMessage.ofUser(request.getMessage()));
+            messages.add(ChatCompletionMessage.builder()
+                .role(ChatCompletionRole.USER)
+                .content(request.getMessage())
+                .build());
 
             // Call OpenAI API
             ChatCompletion completion = openAIClient.chat().completions().create(
                 ChatCompletionCreateParams.builder()
-                    .model("gpt-4o-mini")
+                    .model("gpt-3.5-turbo")
                     .messages(messages)
                     .maxTokens(500)
                     .temperature(0.7)
                     .build()
             );
 
-            String botResponse = completion.choices().get(0).message().content();
+            String botResponse = completion.choices().get(0).message().content().orElse("");
             response.setBotResponse(botResponse);
             response.setSuccess(true);
 
             // Add assistant response to history
-            messages.add(ChatCompletionMessage.ofAssistant(botResponse));
+            messages.add(ChatCompletionMessage.builder()
+                .role(ChatCompletionRole.ASSISTANT)
+                .content(botResponse)
+                .build());
             conversationHistory.put(conversationId, messages);
 
             log.info("Chat processed successfully for conversation: {}", conversationId);
@@ -103,25 +112,34 @@ public class ChatbotService {
             );
 
             if (messages.isEmpty()) {
-                messages.add(ChatCompletionMessage.ofSystem(enrichedSystemPrompt));
+                messages.add(ChatCompletionMessage.builder()
+                    .role(ChatCompletionRole.SYSTEM)
+                    .content(enrichedSystemPrompt)
+                    .build());
             }
 
-            messages.add(ChatCompletionMessage.ofUser(request.getMessage()));
+            messages.add(ChatCompletionMessage.builder()
+                .role(ChatCompletionRole.USER)
+                .content(request.getMessage())
+                .build());
 
             ChatCompletion completion = openAIClient.chat().completions().create(
                 ChatCompletionCreateParams.builder()
-                    .model("gpt-4o-mini")
+                    .model("gpt-3.5-turbo")
                     .messages(messages)
                     .maxTokens(500)
                     .temperature(0.7)
                     .build()
             );
 
-            String botResponse = completion.choices().get(0).message().content();
+            String botResponse = completion.choices().get(0).message().content().orElse("");
             response.setBotResponse(botResponse);
             response.setSuccess(true);
 
-            messages.add(ChatCompletionMessage.ofAssistant(botResponse));
+            messages.add(ChatCompletionMessage.builder()
+                .role(ChatCompletionRole.ASSISTANT)
+                .content(botResponse)
+                .build());
             conversationHistory.put(conversationId, messages);
 
             log.info("Context-aware chat processed for conversation: {}", conversationId);
