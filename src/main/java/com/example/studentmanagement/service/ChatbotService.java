@@ -6,7 +6,6 @@ import com.openai.client.OpenAIClient;
 import com.openai.models.ChatCompletion;
 import com.openai.models.ChatCompletionCreateParams;
 import com.openai.models.ChatCompletionMessage;
-import com.openai.models.ChatCompletionRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,14 +47,14 @@ public class ChatbotService {
             // Add system message if this is a new conversation
             if (messages.isEmpty()) {
                 messages.add(ChatCompletionMessage.builder()
-                    .role(ChatCompletionRole.SYSTEM)
+                    .role("system")
                     .content(SYSTEM_PROMPT)
                     .build());
             }
 
             // Add user message
             messages.add(ChatCompletionMessage.builder()
-                .role(ChatCompletionRole.USER)
+                .role("user")
                 .content(request.getMessage())
                 .build());
 
@@ -75,7 +74,7 @@ public class ChatbotService {
 
             // Add assistant response to history
             messages.add(ChatCompletionMessage.builder()
-                .role(ChatCompletionRole.ASSISTANT)
+                .role("assistant")
                 .content(botResponse)
                 .build());
             conversationHistory.put(conversationId, messages);
@@ -113,13 +112,13 @@ public class ChatbotService {
 
             if (messages.isEmpty()) {
                 messages.add(ChatCompletionMessage.builder()
-                    .role(ChatCompletionRole.SYSTEM)
+                    .role("system")
                     .content(enrichedSystemPrompt)
                     .build());
             }
 
             messages.add(ChatCompletionMessage.builder()
-                .role(ChatCompletionRole.USER)
+                .role("user")
                 .content(request.getMessage())
                 .build());
 
@@ -137,7 +136,7 @@ public class ChatbotService {
             response.setSuccess(true);
 
             messages.add(ChatCompletionMessage.builder()
-                .role(ChatCompletionRole.ASSISTANT)
+                .role("assistant")
                 .content(botResponse)
                 .build());
             conversationHistory.put(conversationId, messages);
